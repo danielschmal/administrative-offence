@@ -1,0 +1,39 @@
+Regulatory Offense Management – Business Logic Description
+Record Regulatory Offense:
+When a new regulatory offense occurs, it is recorded in the system with all relevant information. This includes the offender’s full name, address, and date of birth, as well as the location, date, and type of offense. All entries must be validated and stored in accordance with legal and administrative standards.
+
+Calculate Fine:
+The system calculates the applicable fine based on the type of offense and the legal regulations in force. Adjustments may be applied based on mitigating or aggravating factors such as repeat offenses, the level of endangerment, or cooperation by the offender. The logic for fine calculation is strictly rule-based and must not be influenced by concurrent operations.
+
+Create Payment Request:
+Once the fine amount is calculated, a payment request is generated automatically. The request includes the amount due, the payment deadline, bank details, and instructions for payment. The document is either printed for mailing or sent electronically depending on the contact preferences of the offender.
+
+Initiate Reminder Process:
+If the fine is not paid within the specified deadline, the system automatically initiates a reminder process. This process generates a second request for payment and may include additional reminder fees according to legal guidelines. The reminder is documented in the case file and delivered via the same communication channel as the original payment request.
+
+Generate Fine Notice:
+Based on the recorded data, the system can generate a formal fine notice. This includes all legal details, offense information, calculated fines, and the right to appeal. The fine notice can be printed or sent electronically and is archived as part of the case file.
+
+Appeal Against Fine:
+Offenders may submit an appeal within the legally allowed timeframe. The system records the appeal, assigns it to the relevant reviewing authority, and pauses any escalation processes until the appeal is resolved. All steps in the appeal are logged, and outcomes are stored in the case file.
+
+Monitor Proceedings:
+Each case is assigned a status reflecting its current stage (e.g., “fine issued,” “payment overdue,” “appeal under review”). Caseworkers can view and update the status manually, ensuring transparency and traceability throughout the lifecycle of the case.
+
+View and Edit Case File:
+Authorized caseworkers have access to the complete case file, which includes all documentation, evidence, offender data, and communications. They may add or update information, upload relevant files (e.g., photos, witness statements), or close the case once it is resolved.
+
+Display Case History:
+A chronological history of all actions related to the case is maintained. This includes records of offense creation, fine calculation, payment request issuance, reminder notices, appeals, and case closure. This audit trail ensures accountability and facilitates internal review.
+
+Monitor Payment Status:
+The system tracks whether fines have been paid in full, partially, or not at all. Based on this status, it determines whether further actions—such as additional reminders or legal escalation—are necessary. Payment records are linked to the respective case.
+
+Track Statute of Limitations:
+Each regulatory offense is associated with a statute of limitations. The system monitors these deadlines and alerts caseworkers when action must be taken before a case becomes invalid due to time expiry. This prevents unintentional case lapses.
+
+Display Fine History:
+For each offender, a comprehensive record of all past regulatory offenses, fine notices, and payments is maintained. This history is used to identify repeat offenders and assess whether stricter penalties should apply in new cases.
+
+Generate Reports:
+The system supports the generation of periodic reports such as monthly fine statistics, trends in payment delays, appeal rates, and enforcement effectiveness. Reports are customizable and may be exported in standard formats (PDF, Excel) for further analysis and official review.

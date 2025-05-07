@@ -1,0 +1,25 @@
+Record Regulatory Offense: New regulatory offenses are recorded with all relevant data: Offender (name, address, date of birth), location, date, type of offense.
+
+Calculate Fine: The system automatically calculates the fine based on the type of offense, legal regulations, and any mitigating or aggravating factors (e.g., repeat offenses, endangerment).
+
+Create Payment Request: A payment request (including fine amount, payment deadline, and bank details) is automatically generated and sent to the offender, either by mail or electronically. 
+
+Initiate Reminder Process: If the fine is not paid within the deadline, a reminder process is automatically initiated. Reminder fees may be added, and the offender receives a second request for payment.F05: Generate Fine Notice Based on the recorded data, a fine notice can be created and printed or sent electronically to the offender. 
+
+Appeal Against Fine: The offender can appeal the fine notice, which is recorded in the system and forwarded to the relevant authority for further review. 
+
+Monitor Proceedings: The system displays the current status of each case (e.g., fine procedure initiated, appeal filed, reminder process started). 
+
+View and Edit Case File: Caseworkers can view the complete case file of a regulatory offense, add evidence, modify data, or close the case.
+
+Display Case History: A complete history of all steps taken in the case (e.g., fine notice, appeal, reminders) is displayed.
+
+Monitor Payment Status: The payment status of a fine is monitored to determine whether the amount has been paid and if further reminders need to be issued to the offender.
+
+Track Statute of Limitations: The system automatically tracks the statute of limitations for the respective regulatory offenses and notifies caseworkers when deadlines expire.
+
+Display Fine History: A history of all fine notices and payments made by an offender is displayed to track repeated regulatory violations.
+
+Generate Reports: The system enables the creation of regular reports (e.g., monthly fine statistics, frequency of appeals, payment delays) for analysis and Monitoring
+
+-> It is essential to double-check and update for any issues and improvements without violating the specified business logic. as continued text. do not use concurrency.
