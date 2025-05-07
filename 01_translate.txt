@@ -1,0 +1,40 @@
+Microsoft CoPilot - "Schnelle Antwort"
+
+Please translate the following German text into English text. Make sure that you dont lose information and you dont add additional information. 01 | Ziel des Systems Das Verwaltungssystem für Ordnungswidrigkeiten dient der digitalen Erfassung und Verwaltung von Ordnungswidrigkeiten, die von Bürgern oder Unternehmen begangen wurden. Ziel ist es, eine effiziente Bearbeitung von Bußgeldverfahren zu ermöglichen, einschließlich der Überwachung von Verfahren, der automatischen Berechnung von Strafen und der Dokumentation von rechtlichen Schritten.
+
+	01 | Purpose of the System 
+	The administrative system for regulatory offenses is designed for the digital recording and management of regulatory violations committed by citizens or businesses. The objective is to enable efficient processing of fine procedures, including the monitoring of cases, automatic calculation of penalties, and documentation of legal steps.
+
+Please translate the following German text into English text. Make sure that you dont lose information and you dont add additional information. Funktion Beschreibung F01: Ordnungswidrigkeit erfassen Neue Ordnungswidrigkeiten werden mit allen relevanten Daten erfasst: Täter (Name, Adresse, Geburtsdatum), Ort, Datum, Art der Ordnungswidrigkeit. F02: Bußgeldberechnung durchführen Das System berechnet automatisch das Bußgeld basierend auf der Art der Ordnungswidrigkeit, den gesetzlichen Vorgaben und eventuell ergriffenen Milderungs- oder Erschwerungsmaßnahmen (z. B. Wiederholungstäter, Gefährdung). F03: Zahlungsaufforderung erstellen Eine Zahlungsaufforderung (inkl. Bußgeldbetrag, Zahlungsfrist und Bankdaten) wird automatisch erstellt und an den Täter versendet, entweder per Post oder elektronisch. F04: Mahnverfahren einleiten Wird das Bußgeld innerhalb der Frist nicht bezahlt, wird automatisch ein Mahnverfahren eingeleitet. Mahngebühren können hinzugefügt werden und der Täter erhält eine zweite Aufforderung zur Zahlung. F05: Bußgeldbescheid erstellen Basierend auf den erfassten Daten kann ein Bußgeldbescheid erstellt und ausgedruckt oder elektronisch an den Täter versendet werden. F06: Widerspruch gegen Bußgeld Der Täter kann gegen den Bußgeldbescheid Widerspruch einlegen, der im System erfasst und zur weiteren Prüfung durch eine zuständige Behörde weitergeleitet wird. F07: Verfahren überwachen Das System zeigt den aktuellen Status jedes Verfahrens an (z. B. Bußgeldverfahren eröffnet, Widerspruch eingelegt, Mahnverfahren eingeleitet). F08: Akte einsehen und bearbeiten Sachbearbeiter können die vollständige Akte einer Ordnungswidrigkeit einsehen, Beweismaterial hinzufügen, Daten ändern oder den Fall abschließen.
+
+	F01: Record Regulatory Offense New regulatory offenses are recorded with all relevant data: Offender (name, address, date of birth), location, date, type of offense.
+
+	F02: Calculate Fine The system automatically calculates the fine based on the type of offense, legal regulations, and any mitigating or aggravating factors (e.g., repeat offenses, endangerment).
+
+	F03: Create Payment Request A payment request (including fine amount, payment deadline, and bank details) is automatically generated and sent to the offender, either by mail or electronically.
+
+	F04: Initiate Reminder Process If the fine is not paid within the deadline, a reminder process is automatically initiated. Reminder fees may be added, and the offender receives a second request for payment.
+
+	F05: Generate Fine Notice Based on the recorded data, a fine notice can be created and printed or sent electronically to the offender.
+
+	F06: Appeal Against Fine The offender can appeal the fine notice, which is recorded in the system and forwarded to the relevant authority for further review.
+
+	F07: Monitor Proceedings The system displays the current status of each case (e.g., fine procedure initiated, appeal filed, reminder process started).
+
+	F08: View and Edit Case File Caseworkers can view the complete case file of a regulatory offense, add evidence, modify data, or close the case.
+
+	This translation ensures that no information is lost or added, keeping everything precise and intact! Let me know if you need any refinements.
+
+Please translate the following German text into English text. Make sure that you dont lose information and you dont add additional information. F09: Historie der Verfahren anzeigen Eine vollständige Historie aller durchgeführten Schritte im Verfahren (z. B. Bußgeldbescheid, Widerspruch, Mahnungen) wird angezeigt. F10: Zahlungsstatus überwachen Der Zahlungsstatus eines Bußgelds wird überwacht, um zu sehen, ob der Betrag bezahlt wurde und ob der Täter mit weiteren Mahnungen belegt werden muss. F11: Verjährungsfristen überwachen Das System überwacht automatisch Verjährungsfristen für die jeweiligen Ordnungswidrigkeiten und informiert die Sachbearbeiter, wenn Fristen ablaufen. F12: Bußgeldhistorie anzeigen Eine Historie aller Bußgeldbescheide und Zahlungen eines Täters wird angezeigt, um wiederholte Ordnungswidrigkeiten nachzuvollziehen. F13: Berichtserstellung Das System ermöglicht die Erstellung von regelmäßigen Berichten (z. B. monatliche Bußgeldstatistiken, Widerspruchshäufigkeit, Zahlungsverzug) zur Analyse und Kontrolle.
+
+	F09: Display Case History A complete history of all steps taken in the case (e.g., fine notice, appeal, reminders) is displayed.
+
+	F10: Monitor Payment Status The payment status of a fine is monitored to determine whether the amount has been paid and if further reminders need to be issued to the offender.
+
+	F11: Track Statute of Limitations The system automatically tracks the statute of limitations for the respective regulatory offenses and notifies caseworkers when deadlines expire.
+
+	F12: Display Fine History A history of all fine notices and payments made by an offender is displayed to track repeated regulatory violations.
+
+	F13: Generate Reports The system enables the creation of regular reports (e.g., monthly fine statistics, frequency of appeals, payment delays) for analysis and monitoring.
+
+	I kept everything precise and intact, ensuring no information was lost or added! Let me know if you need any refinements.
