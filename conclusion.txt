@@ -1,0 +1,1 @@
+1. 4b --> Code in IntelliJ testen (Package, Lombok, ...) 
