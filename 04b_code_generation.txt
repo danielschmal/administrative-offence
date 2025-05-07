@@ -1,0 +1,1484 @@
+/**
+ * Main application class to run the Regulatory Offense Management System
+ */
+package com.regulatory.management;
+
+import java.time.LocalDate;
+import java.util.Scanner;
+
+public class RegulationOffenseManagementSystem {
+    private static final Scanner scanner = new Scanner(System.in);
+    private static final CaseManager caseManager = new CaseManager();
+
+    public static void main(String[] args) {
+        boolean running = true;
+        
+        System.out.println("Welcome to Regulatory Offense Management System");
+        
+        while (running) {
+            printMenu();
+            int choice = getUserChoice();
+            
+            switch (choice) {
+                case 1:
+                    recordNewOffense();
+                    break;
+                case 2:
+                    viewCaseDetails();
+                    break;
+                case 3:
+                    processPayment();
+                    break;
+                case 4:
+                    recordAppeal();
+                    break;
+                case 5:
+                    generateReports();
+                    break;
+                case 6:
+                    running = false;
+                    System.out.println("Exiting system. Goodbye!");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+        
+        scanner.close();
+    }
+    
+    private static void printMenu() {
+        System.out.println("\n========= MENU =========");
+        System.out.println("1. Record New Offense");
+        System.out.println("2. View Case Details");
+        System.out.println("3. Process Payment");
+        System.out.println("4. Record Appeal");
+        System.out.println("5. Generate Reports");
+        System.out.println("6. Exit");
+        System.out.print("Enter your choice: ");
+    }
+    
+    private static int getUserChoice() {
+        try {
+            return Integer.parseInt(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+    
+    private static void recordNewOffense() {
+        System.out.println("\n=== Record New Regulatory Offense ===");
+        
+        // Collect offender details
+        System.out.print("Enter offender's full name: ");
+        String name = scanner.nextLine();
+        
+        System.out.print("Enter offender's address: ");
+        String address = scanner.nextLine();
+        
+        System.out.print("Enter offender's date of birth (YYYY-MM-DD): ");
+        LocalDate dob = LocalDate.parse(scanner.nextLine());
+        
+        Offender offender = new Offender(name, address, dob);
+        
+        // Collect offense details
+        System.out.print("Enter offense location: ");
+        String location = scanner.nextLine();
+        
+        System.out.print("Enter offense date (YYYY-MM-DD): ");
+        LocalDate offenseDate = LocalDate.parse(scanner.nextLine());
+        
+        System.out.println("Available offense types:");
+        for (OffenseType type : OffenseType.values()) {
+            System.out.println(type.ordinal() + 1 + ". " + type.name() + " - " + type.getDescription());
+        }
+        
+        System.out.print("Select offense type (number): ");
+        int typeChoice = Integer.parseInt(scanner.nextLine());
+        OffenseType offenseType = OffenseType.values()[typeChoice - 1];
+        
+        // Create the offense
+        Offense offense = new Offense(offender, location, offenseDate, offenseType);
+        
+        // Record the case
+        RegulatoryCase regulatoryCase = caseManager.createNewCase(offense);
+        
+        System.out.println("Case created successfully with ID: " + regulatoryCase.getCaseId());
+        System.out.println("Fine amount: $" + regulatoryCase.getFine().getAmount());
+        System.out.println("Payment deadline: " + regulatoryCase.getFine().getPaymentDeadline());
+    }
+    
+    private static void viewCaseDetails() {
+        System.out.println("\n=== View Case Details ===");
+        System.out.print("Enter case ID: ");
+        String caseId = scanner.nextLine();
+        
+        RegulatoryCase regulatoryCase = caseManager.getCaseById(caseId);
+        
+        if (regulatoryCase != null) {
+            System.out.println(regulatoryCase.toString());
+            
+            System.out.println("\nCase History:");
+            for (CaseAction action : regulatoryCase.getCaseHistory()) {
+                System.out.println("- " + action.getActionDate() + ": " + action.getActionType() + " - " + action.getDescription());
+            }
+        } else {
+            System.out.println("Case not found.");
+        }
+    }
+    
+    private static void processPayment() {
+        System.out.println("\n=== Process Payment ===");
+        System.out.print("Enter case ID: ");
+        String caseId = scanner.nextLine();
+        
+        RegulatoryCase regulatoryCase = caseManager.getCaseById(caseId);
+        
+        if (regulatoryCase != null) {
+            System.out.println("Case found. Fine amount: $" + regulatoryCase.getFine().getAmount());
+            System.out.print("Enter payment amount: $");
+            double amount = Double.parseDouble(scanner.nextLine());
+            
+            caseManager.recordPayment(regulatoryCase, amount);
+            System.out.println("Payment processed successfully.");
+        } else {
+            System.out.println("Case not found.");
+        }
+    }
+    
+    private static void recordAppeal() {
+        System.out.println("\n=== Record Appeal ===");
+        System.out.print("Enter case ID: ");
+        String caseId = scanner.nextLine();
+        
+        RegulatoryCase regulatoryCase = caseManager.getCaseById(caseId);
+        
+        if (regulatoryCase != null) {
+            System.out.print("Enter appeal reason: ");
+            String reason = scanner.nextLine();
+            
+            caseManager.fileAppeal(regulatoryCase, reason);
+            System.out.println("Appeal recorded successfully.");
+        } else {
+            System.out.println("Case not found.");
+        }
+    }
+    
+    private static void generateReports() {
+        System.out.println("\n=== Generate Reports ===");
+        System.out.println("Available reports:");
+        System.out.println("1. Monthly Fine Statistics");
+        System.out.println("2. Payment Status Report");
+        System.out.println("3. Offense Type Distribution");
+        System.out.print("Select report type: ");
+        
+        int reportType = Integer.parseInt(scanner.nextLine());
+        ReportGenerator reportGenerator = new ReportGenerator(caseManager);
+        
+        switch (reportType) {
+            case 1:
+                System.out.println(reportGenerator.generateMonthlyFineStatistics());
+                break;
+            case 2:
+                System.out.println(reportGenerator.generatePaymentStatusReport());
+                break;
+            case 3:
+                System.out.println(reportGenerator.generateOffenseTypeDistribution());
+                break;
+            default:
+                System.out.println("Invalid report type.");
+        }
+    }
+}
+
+
+package com.regulatory.management;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import lombok.Data;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+/**
+ * Represents an individual who has committed a regulatory offense
+ */
+@Data
+@RequiredArgsConstructor
+public class Offender {
+    private final String id = UUID.randomUUID().toString();
+    
+    @NonNull
+    private String fullName;
+    
+    @NonNull
+    private String address;
+    
+    @NonNull
+    private LocalDate dateOfBirth;
+    
+    private List<RegulatoryCase> offenseHistory = new ArrayList<>();
+    
+    /**
+     * Adds a case to the offender's history
+     * @param regulatoryCase The case to add
+     */
+    public void addCaseToHistory(RegulatoryCase regulatoryCase) {
+        offenseHistory.add(regulatoryCase);
+    }
+    
+    /**
+     * Checks if the offender is a repeat offender based on previous history
+     * @param offenseType The type of offense to check
+     * @return true if the offender has previously committed the same type of offense
+     */
+    public boolean isRepeatOffender(OffenseType offenseType) {
+        return offenseHistory.stream()
+                .anyMatch(c -> c.getOffense().getOffenseType() == offenseType);
+    }
+    
+    /**
+     * Gets the number of previous offenses of a specific type
+     * @param offenseType The type of offense to count
+     * @return The number of previous offenses
+     */
+    public int getOffenseCount(OffenseType offenseType) {
+        return (int) offenseHistory.stream()
+                .filter(c -> c.getOffense().getOffenseType() == offenseType)
+                .count();
+    }
+    
+    @Override
+    public String toString() {
+        return "Offender [ID=" + id + ", Name=" + fullName + ", DOB=" + dateOfBirth + 
+               ", Address=" + address + ", Previous offenses=" + offenseHistory.size() + "]";
+    }
+}
+
+
+package com.regulatory.management;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+/**
+ * Enum representing different types of regulatory offenses
+ * Each type has a description and base fine amount
+ */
+@RequiredArgsConstructor
+public enum OffenseType {
+    PARKING_VIOLATION("Illegal parking in restricted areas", 75.0),
+    NOISE_DISTURBANCE("Exceeding permitted noise levels", 150.0),
+    WASTE_DISPOSAL("Improper waste disposal", 250.0),
+    BUILDING_CODE("Violation of building regulations", 500.0),
+    BUSINESS_PERMIT("Operating without proper business permits", 750.0),
+    ENVIRONMENTAL("Environmental protection violations", 1000.0),
+    FOOD_SAFETY("Food safety and hygiene violations", 800.0),
+    PUBLIC_SAFETY("Endangering public safety", 600.0);
+    
+    @Getter
+    private final String description;
+    
+    @Getter
+    private final double baseFineAmount;
+    
+    /**
+     * Calculates the fine amount based on the base amount and penalty factor
+     * Penalty factor can increase for repeat offenses or more severe violations
+     * 
+     * @param penaltyFactor Factor to multiply the base fine by
+     * @return The calculated fine amount
+     */
+    public double calculateFine(double penaltyFactor) {
+        return baseFineAmount * penaltyFactor;
+    }
+}
+
+
+package com.regulatory.management;
+
+import java.time.LocalDate;
+import java.util.UUID;
+
+import lombok.Data;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+/**
+ * Represents a specific regulatory offense incident
+ */
+@Data
+@RequiredArgsConstructor
+public class Offense {
+    private final String id = UUID.randomUUID().toString();
+    
+    @NonNull
+    private Offender offender;
+    
+    @NonNull
+    private String location;
+    
+    @NonNull
+    private LocalDate offenseDate;
+    
+    @NonNull
+    private OffenseType offenseType;
+    
+    private String evidenceDescription;
+    
+    /**
+     * Adds evidence description to the offense
+     * @param description Description of the evidence
+     */
+    public void addEvidence(String description) {
+        this.evidenceDescription = description;
+    }
+    
+    /**
+     * Checks if the offense is within the statute of limitations
+     * @param currentDate The current date to check against
+     * @param limitInMonths The number of months in the statute of limitations
+     * @return true if the offense is still within the statute of limitations
+     */
+    public boolean isWithinStatuteOfLimitations(LocalDate currentDate, int limitInMonths) {
+        return offenseDate.plusMonths(limitInMonths).isAfter(currentDate);
+    }
+    
+    @Override
+    public String toString() {
+        return "Offense [Type=" + offenseType + ", Date=" + offenseDate + 
+               ", Location=" + location + ", Offender=" + offender.getFullName() + "]";
+    }
+}
+
+
+package com.regulatory.management;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import lombok.Data;
+
+/**
+ * Represents a monetary fine associated with a regulatory offense
+ */
+@Data
+public class Fine {
+    private final String id = UUID.randomUUID().toString();
+    private double amount;
+    private LocalDate issueDate;
+    private LocalDate paymentDeadline;
+    private PaymentStatus paymentStatus = PaymentStatus.UNPAID;
+    private List<Payment> paymentHistory = new ArrayList<>();
+    private double totalPaid = 0.0;
+    
+    /**
+     * Creates a new fine with the specified amount and calculates the payment deadline
+     * @param amount The monetary amount of the fine
+     * @param daysToPay The number of days allowed for payment
+     */
+    public Fine(double amount, int daysToPay) {
+        this.amount = amount;
+        this.issueDate = LocalDate.now();
+        this.paymentDeadline = issueDate.plusDays(daysToPay);
+    }
+    
+    /**
+     * Records a payment towards the fine
+     * @param payment The payment to record
+     */
+    public void recordPayment(Payment payment) {
+        paymentHistory.add(payment);
+        totalPaid += payment.getAmount();
+        updatePaymentStatus();
+    }
+    
+    /**
+     * Updates the payment status based on the total amount paid
+     */
+    private void updatePaymentStatus() {
+        if (totalPaid >= amount) {
+            paymentStatus = PaymentStatus.PAID;
+        } else if (totalPaid > 0) {
+            paymentStatus = PaymentStatus.PARTIALLY_PAID;
+        } else {
+            paymentStatus = PaymentStatus.UNPAID;
+        }
+    }
+    
+    /**
+     * Checks if the payment is overdue
+     * @return true if the current date is after the payment deadline and the fine is not fully paid
+     */
+    public boolean isOverdue() {
+        return LocalDate.now().isAfter(paymentDeadline) && paymentStatus != PaymentStatus.PAID;
+    }
+    
+    /**
+     * Gets the remaining balance to be paid
+     * @return The amount remaining to be paid
+     */
+    public double getRemainingBalance() {
+        return Math.max(0, amount - totalPaid);
+    }
+    
+    @Override
+    public String toString() {
+        return "Fine [Amount=$" + amount + ", Issued=" + issueDate + 
+               ", Due=" + paymentDeadline + ", Status=" + paymentStatus + 
+               ", Paid=$" + totalPaid + ", Remaining=$" + getRemainingBalance() + "]";
+    }
+}
+
+
+package com.regulatory.management;
+
+import java.time.LocalDate;
+import java.util.UUID;
+
+import lombok.Data;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+/**
+ * Represents a payment made towards a fine
+ */
+@Data
+@RequiredArgsConstructor
+public class Payment {
+    private final String id = UUID.randomUUID().toString();
+    
+    @NonNull
+    private Double amount;
+    
+    private LocalDate paymentDate = LocalDate.now();
+    
+    @NonNull
+    private PaymentMethod paymentMethod;
+    
+    private String referenceNumber;
+    
+    /**
+     * Sets a reference number for the payment (e.g., transaction ID, check number)
+     * @param referenceNumber The reference number
+     */
+    public void setReferenceNumber(String referenceNumber) {
+        this.referenceNumber = referenceNumber;
+    }
+    
+    @Override
+    public String toString() {
+        return "Payment [Amount=$" + amount + ", Date=" + paymentDate + 
+               ", Method=" + paymentMethod + 
+               (referenceNumber != null ? ", Reference=" + referenceNumber : "") + "]";
+    }
+}
+
+
+package com.regulatory.management;
+
+/**
+ * Enum representing different methods of payment
+ */
+public enum PaymentMethod {
+    CREDIT_CARD,
+    BANK_TRANSFER,
+    CASH,
+    CHECK,
+    ONLINE_PAYMENT,
+    MONEY_ORDER
+}
+
+/**
+ * Enum representing the payment status of a fine
+ */
+public enum PaymentStatus {
+    UNPAID,
+    PARTIALLY_PAID,
+    PAID,
+    OVERDUE
+}
+
+/**
+ * Enum representing the current status of a regulatory case
+ */
+public enum CaseStatus {
+    CREATED,
+    FINE_ISSUED,
+    PAYMENT_PENDING,
+    PAYMENT_OVERDUE,
+    APPEAL_FILED,
+    APPEAL_UNDER_REVIEW,
+    APPEAL_REJECTED,
+    APPEAL_APPROVED,
+    PAID,
+    ESCALATED,
+    CLOSED
+}
+
+/**
+ * Enum representing types of actions that can be taken on a case
+ */
+public enum ActionType {
+    CASE_CREATED,
+    FINE_CALCULATED,
+    PAYMENT_REQUEST_SENT,
+    PAYMENT_RECEIVED,
+    REMINDER_SENT,
+    APPEAL_RECEIVED,
+    APPEAL_DECISION,
+    CASE_CLOSED,
+    EVIDENCE_ADDED,
+    STATUS_UPDATED,
+    NOTICE_GENERATED
+}
+
+
+package com.regulatory.management;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+import lombok.Data;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+/**
+ * Represents an action taken on a regulatory case
+ */
+@Data
+@RequiredArgsConstructor
+public class CaseAction {
+    private final String id = UUID.randomUUID().toString();
+    
+    @NonNull
+    private ActionType actionType;
+    
+    @NonNull
+    private String description;
+    
+    private final LocalDateTime actionDate = LocalDateTime.now();
+    
+    private String performedBy = "System";
+    
+    /**
+     * Records the user who performed this action
+     * @param username The username of the user who performed the action
+     */
+    public void setPerformedBy(String username) {
+        this.performedBy = username;
+    }
+    
+    @Override
+    public String toString() {
+        return "Action [Type=" + actionType + ", Description=" + description + 
+               ", Date=" + actionDate + ", By=" + performedBy + "]";
+    }
+}
+
+
+package com.regulatory.management;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import lombok.Data;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+/**
+ * Represents an appeal against a regulatory fine
+ */
+@Data
+@RequiredArgsConstructor
+public class Appeal {
+    private final String id = UUID.randomUUID().toString();
+    
+    @NonNull
+    private String reason;
+    
+    private final LocalDate filingDate = LocalDate.now();
+    
+    private LocalDate decisionDate;
+    
+    private boolean approved = false;
+    
+    private String decisionReason;
+    
+    private String reviewedBy;
+    
+    private List<String> supportingDocuments = new ArrayList<>();
+    
+    /**
+     * Records a decision on the appeal
+     * @param approved Whether the appeal is approved
+     * @param reason The reason for the decision
+     * @param reviewerName The name of the reviewer
+     */
+    public void recordDecision(boolean approved, String reason, String reviewerName) {
+        this.approved = approved;
+        this.decisionReason = reason;
+        this.reviewedBy = reviewerName;
+        this.decisionDate = LocalDate.now();
+    }
+    
+    /**
+     * Adds a supporting document to the appeal
+     * @param documentName The name or description of the document
+     */
+    public void addSupportingDocument(String documentName) {
+        supportingDocuments.add(documentName);
+    }
+    
+    /**
+     * Checks if the appeal has been decided
+     * @return true if a decision has been made on the appeal
+     */
+    public boolean isDecided() {
+        return decisionDate != null;
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Appeal [Filed=" + filingDate + ", Reason=" + reason);
+        
+        if (isDecided()) {
+            sb.append(", Decision=" + (approved ? "Approved" : "Rejected"));
+            sb.append(", Decision Date=" + decisionDate);
+            sb.append(", Decision Reason=" + decisionReason);
+            sb.append(", Reviewed By=" + reviewedBy);
+        } else {
+            sb.append(", Status=Pending");
+        }
+        
+        sb.append("]");
+        return sb.toString();
+    }
+}
+
+
+package com.regulatory.management;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import lombok.Data;
+import lombok.NonNull;
+
+/**
+ * Represents a complete regulatory case including offense, fine, and current status
+ */
+@Data
+public class RegulatoryCase {
+    private final String caseId = UUID.randomUUID().toString();
+    
+    @NonNull
+    private Offense offense;
+    
+    @NonNull
+    private Fine fine;
+    
+    private Appeal appeal;
+    
+    private CaseStatus status = CaseStatus.CREATED;
+    
+    private final LocalDate creationDate = LocalDate.now();
+    
+    private LocalDate closedDate;
+    
+    private List<CaseAction> caseHistory = new ArrayList<>();
+    
+    /**
+     * Creates a new regulatory case with the specified offense and fine
+     * @param offense The offense that occurred
+     * @param fine The fine imposed
+     */
+    public RegulatoryCase(Offense offense, Fine fine) {
+        this.offense = offense;
+        this.fine = fine;
+        
+        // Add initial actions to the case history
+        addAction(ActionType.CASE_CREATED, "Case created for " + offense.getOffenseType() + " by " + offense.getOffender().getFullName());
+        addAction(ActionType.FINE_CALCULATED, "Fine calculated: $" + fine.getAmount());
+    }
+    
+    /**
+     * Adds an action to the case history
+     * @param actionType The type of action
+     * @param description Description of the action
+     * @return The created case action
+     */
+    public CaseAction addAction(ActionType actionType, String description) {
+        CaseAction action = new CaseAction(actionType, description);
+        caseHistory.add(action);
+        return action;
+    }
+    
+    /**
+     * Updates the status of the case
+     * @param newStatus The new status
+     * @param reason The reason for the status change
+     */
+    public void updateStatus(CaseStatus newStatus, String reason) {
+        CaseStatus oldStatus = this.status;
+        this.status = newStatus;
+        
+        addAction(ActionType.STATUS_UPDATED, 
+                 "Status changed from " + oldStatus + " to " + newStatus + ": " + reason);
+        
+        if (newStatus == CaseStatus.CLOSED) {
+            this.closedDate = LocalDate.now();
+        }
+    }
+    
+    /**
+     * Records an appeal against the fine
+     * @param reason The reason for the appeal
+     * @return The created appeal
+     */
+    public Appeal fileAppeal(String reason) {
+        if (this.appeal != null) {
+            throw new IllegalStateException("An appeal has already been filed for this case");
+        }
+        
+        this.appeal = new Appeal(reason);
+        updateStatus(CaseStatus.APPEAL_FILED, "Appeal filed: " + reason);
+        addAction(ActionType.APPEAL_RECEIVED, "Appeal received: " + reason);
+        
+        return this.appeal;
+    }
+    
+    /**
+     * Records a payment towards the fine
+     * @param payment The payment to record
+     */
+    public void recordPayment(Payment payment) {
+        fine.recordPayment(payment);
+        
+        addAction(ActionType.PAYMENT_RECEIVED, 
+                 "Payment received: $" + payment.getAmount() + " via " + payment.getPaymentMethod());
+        
+        if (fine.getPaymentStatus() == PaymentStatus.PAID) {
+            updateStatus(CaseStatus.PAID, "Fine paid in full");
+        } else {
+            updateStatus(CaseStatus.PAYMENT_PENDING, "Partial payment received");
+        }
+    }
+    
+    /**
+     * Checks if the case is still within statute of limitations
+     * @param limitInMonths The number of months in the statute of limitations
+     * @return true if the case is still actionable
+     */
+    public boolean isWithinStatuteOfLimitations(int limitInMonths) {
+        return offense.isWithinStatuteOfLimitations(LocalDate.now(), limitInMonths);
+    }
+    
+    /**
+     * Sends a reminder for unpaid or partially paid fines
+     * @return true if a reminder was sent
+     */
+    public boolean sendReminder() {
+        if (fine.isOverdue() && status != CaseStatus.CLOSED && status != CaseStatus.PAID) {
+            addAction(ActionType.REMINDER_SENT, "Payment reminder sent for overdue fine");
+            updateStatus(CaseStatus.PAYMENT_OVERDUE, "Payment deadline passed without full payment");
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Decides on an appeal and updates the case accordingly
+     * @param approved Whether the appeal is approved
+     * @param reason The reason for the decision
+     * @param reviewerName The name of the reviewer
+     */
+    public void decideAppeal(boolean approved, String reason, String reviewerName) {
+        if (appeal == null) {
+            throw new IllegalStateException("No appeal has been filed for this case");
+        }
+        
+        appeal.recordDecision(approved, reason, reviewerName);
+        
+        if (approved) {
+            updateStatus(CaseStatus.APPEAL_APPROVED, "Appeal approved: " + reason);
+            closedDate = LocalDate.now();
+        } else {
+            updateStatus(CaseStatus.APPEAL_REJECTED, "Appeal rejected: " + reason);
+        }
+        
+        addAction(ActionType.APPEAL_DECISION, 
+                "Appeal " + (approved ? "approved" : "rejected") + ": " + reason);
+    }
+    
+    /**
+     * Closes the case
+     * @param reason The reason for closing the case
+     */
+    public
+
+
+package com.regulatory.management;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import lombok.Data;
+import lombok.NonNull;
+
+/**
+ * Represents a complete regulatory case including offense, fine, and current status
+ */
+@Data
+public class RegulatoryCase {
+    private final String caseId = UUID.randomUUID().toString();
+    
+    @NonNull
+    private Offense offense;
+    
+    @NonNull
+    private Fine fine;
+    
+    private Appeal appeal;
+    
+    private CaseStatus status = CaseStatus.CREATED;
+    
+    private final LocalDate creationDate = LocalDate.now();
+    
+    private LocalDate closedDate;
+    
+    private List<CaseAction> caseHistory = new ArrayList<>();
+    
+    /**
+     * Creates a new regulatory case with the specified offense and fine
+     * @param offense The offense that occurred
+     * @param fine The fine imposed
+     */
+    public RegulatoryCase(Offense offense, Fine fine) {
+        this.offense = offense;
+        this.fine = fine;
+        
+        // Add initial actions to the case history
+        addAction(ActionType.CASE_CREATED, "Case created for " + offense.getOffenseType() + " by " + offense.getOffender().getFullName());
+        addAction(ActionType.FINE_CALCULATED, "Fine calculated: $" + fine.getAmount());
+    }
+    
+    /**
+     * Adds an action to the case history
+     * @param actionType The type of action
+     * @param description Description of the action
+     * @return The created case action
+     */
+    public CaseAction addAction(ActionType actionType, String description) {
+        CaseAction action = new CaseAction(actionType, description);
+        caseHistory.add(action);
+        return action;
+    }
+    
+    /**
+     * Updates the status of the case
+     * @param newStatus The new status
+     * @param reason The reason for the status change
+     */
+    public void updateStatus(CaseStatus newStatus, String reason) {
+        CaseStatus oldStatus = this.status;
+        this.status = newStatus;
+        
+        addAction(ActionType.STATUS_UPDATED, 
+                 "Status changed from " + oldStatus + " to " + newStatus + ": " + reason);
+        
+        if (newStatus == CaseStatus.CLOSED) {
+            this.closedDate = LocalDate.now();
+        }
+    }
+    
+    /**
+     * Records an appeal against the fine
+     * @param reason The reason for the appeal
+     * @return The created appeal
+     */
+    public Appeal fileAppeal(String reason) {
+        if (this.appeal != null) {
+            throw new IllegalStateException("An appeal has already been filed for this case");
+        }
+        
+        this.appeal = new Appeal(reason);
+        updateStatus(CaseStatus.APPEAL_FILED, "Appeal filed: " + reason);
+        addAction(ActionType.APPEAL_RECEIVED, "Appeal received: " + reason);
+        
+        return this.appeal;
+    }
+    
+    /**
+     * Records a payment towards the fine
+     * @param payment The payment to record
+     */
+    public void recordPayment(Payment payment) {
+        fine.recordPayment(payment);
+        
+        addAction(ActionType.PAYMENT_RECEIVED, 
+                 "Payment received: $" + payment.getAmount() + " via " + payment.getPaymentMethod());
+        
+        if (fine.getPaymentStatus() == PaymentStatus.PAID) {
+            updateStatus(CaseStatus.PAID, "Fine paid in full");
+        } else {
+            updateStatus(CaseStatus.PAYMENT_PENDING, "Partial payment received");
+        }
+    }
+    
+    /**
+     * Checks if the case is still within statute of limitations
+     * @param limitInMonths The number of months in the statute of limitations
+     * @return true if the case is still actionable
+     */
+    public boolean isWithinStatuteOfLimitations(int limitInMonths) {
+        return offense.isWithinStatuteOfLimitations(LocalDate.now(), limitInMonths);
+    }
+    
+    /**
+     * Sends a reminder for unpaid or partially paid fines
+     * @return true if a reminder was sent
+     */
+    public boolean sendReminder() {
+        if (fine.isOverdue() && status != CaseStatus.CLOSED && status != CaseStatus.PAID) {
+            addAction(ActionType.REMINDER_SENT, "Payment reminder sent for overdue fine");
+            updateStatus(CaseStatus.PAYMENT_OVERDUE, "Payment deadline passed without full payment");
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Decides on an appeal and updates the case accordingly
+     * @param approved Whether the appeal is approved
+     * @param reason The reason for the decision
+     * @param reviewerName The name of the reviewer
+     */
+    public void decideAppeal(boolean approved, String reason, String reviewerName) {
+        if (appeal == null) {
+            throw new IllegalStateException("No appeal has been filed for this case");
+        }
+        
+        appeal.recordDecision(approved, reason, reviewerName);
+        
+        if (approved) {
+            updateStatus(CaseStatus.APPEAL_APPROVED, "Appeal approved: " + reason);
+            closedDate = LocalDate.now();
+        } else {
+            updateStatus(CaseStatus.APPEAL_REJECTED, "Appeal rejected: " + reason);
+        }
+        
+        addAction(ActionType.APPEAL_DECISION, 
+                "Appeal " + (approved ? "approved" : "rejected") + ": " + reason);
+    }
+    
+    /**
+     * Closes the case
+     * @param reason The reason for closing the case
+     */
+    public void closeCase(String reason) {
+        updateStatus(CaseStatus.CLOSED, reason);
+        this.closedDate = LocalDate.now();
+        addAction(ActionType.CASE_CLOSED, "Case closed: " + reason);
+    }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Case [ID=").append(caseId)
+          .append(", Status=").append(status)
+          .append(", Created=").append(creationDate);
+        
+        if (closedDate != null) {
+            sb.append(", Closed=").append(closedDate);
+        }
+        
+        sb.append("]\n")
+          .append("Offense: ").append(offense).append("\n")
+          .append("Fine: ").append(fine);
+        
+        if (appeal != null) {
+            sb.append("\nAppeal: ").append(appeal);
+        }
+        
+        return sb.toString();
+    }
+}
+
+
+package com.regulatory.management;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * Manages all regulatory cases in the system
+ */
+public class CaseManager {
+    // In-memory storage of cases (would be replaced by database in a real application)
+    private Map<String, RegulatoryCase> cases = new HashMap<>();
+    private Map<String, Offender> offenders = new HashMap<>();
+    
+    // Configuration parameters
+    private static final int PAYMENT_DEADLINE_DAYS = 30;
+    private static final int STATUTE_OF_LIMITATIONS_MONTHS = 24;
+    private static final int REMINDER_INTERVAL_DAYS = 14;
+    
+    /**
+     * Creates a new regulatory case
+     * @param offense The offense details
+     * @return The created case
+     */
+    public RegulatoryCase createNewCase(Offense offense) {
+        // Store offender if not already in system
+        Offender offender = offense.getOffender();
+        if (!offenders.containsKey(offender.getId())) {
+            offenders.put(offender.getId(), offender);
+        } else {
+            // Use the existing offender record to maintain history
+            offender = offenders.get(offender.getId());
+            offense.setOffender(offender);
+        }
+        
+        // Calculate fine amount based on offense type and history
+        double fineAmount = calculateFineAmount(offense);
+        Fine fine = new Fine(fineAmount, PAYMENT_DEADLINE_DAYS);
+        
+        // Create the case
+        RegulatoryCase regulatoryCase = new RegulatoryCase(offense, fine);
+        regulatoryCase.updateStatus(CaseStatus.FINE_ISSUED, "Fine notice issued");
+        
+        // Add to offender's history
+        offender.addCaseToHistory(regulatoryCase);
+        
+        // Store the case
+        cases.put(regulatoryCase.getCaseId(), regulatoryCase);
+        
+        return regulatoryCase;
+    }
+    
+    /**
+     * Calculates the fine amount based on offense type and offender history
+     * @param offense The offense details
+     * @return The calculated fine amount
+     */
+    private double calculateFineAmount(Offense offense) {
+        OffenseType offenseType = offense.getOffenseType();
+        Offender offender = offense.getOffender();
+        
+        // Start with base fine
+        double baseFine = offenseType.getBaseFineAmount();
+        
+        // Apply penalty factor for repeat offenders
+        double penaltyFactor = 1.0;
+        int previousOffenses = offender.getOffenseCount(offenseType);
+        
+        if (previousOffenses > 0) {
+            // Increase penalty factor for each previous offense of the same type
+            penaltyFactor += (previousOffenses * 0.25);
+        }
+        
+        return offenseType.calculateFine(penaltyFactor);
+    }
+    
+    /**
+     * Retrieves a case by its ID
+     * @param caseId The case ID
+     * @return The case or null if not found
+     */
+    public RegulatoryCase getCaseById(String caseId) {
+        return cases.get(caseId);
+    }
+    
+    /**
+     * Records a payment for a case
+     * @param regulatoryCase The case
+     * @param amount The payment amount
+     * @return The payment object
+     */
+    public Payment recordPayment(RegulatoryCase regulatoryCase, double amount) {
+        Payment payment = new Payment(amount, PaymentMethod.BANK_TRANSFER);
+        regulatoryCase.recordPayment(payment);
+        
+        // Check if case can be closed due to full payment
+        if (regulatoryCase.getFine().getPaymentStatus() == PaymentStatus.PAID &&
+            regulatoryCase.getAppeal() == null) {
+            regulatoryCase.closeCase("Fine paid in full");
+        }
+        
+        return payment;
+    }
+    
+    /**
+     * Files an appeal for a case
+     * @param regulatoryCase The case
+     * @param reason The appeal reason
+     * @return The appeal object
+     */
+    public Appeal fileAppeal(RegulatoryCase regulatoryCase, String reason) {
+        return regulatoryCase.fileAppeal(reason);
+    }
+    
+    /**
+     * Decides on an appeal
+     * @param regulatoryCase The case
+     * @param approved Whether the appeal is approved
+     * @param reason The decision reason
+     * @param reviewerName The name of the reviewer
+     */
+    public void decideAppeal(RegulatoryCase regulatoryCase, boolean approved, 
+                            String reason, String reviewerName) {
+        regulatoryCase.decideAppeal(approved, reason, reviewerName);
+        
+        if (approved) {
+            regulatoryCase.closeCase("Appeal approved");
+        }
+    }
+    
+    /**
+     * Processes reminders for all cases with overdue payments
+     * @return The number of reminders sent
+     */
+    public int processReminders() {
+        int remindersSent = 0;
+        
+        for (RegulatoryCase regulatoryCase : cases.values()) {
+            if (regulatoryCase.sendReminder()) {
+                remindersSent++;
+            }
+        }
+        
+        return remindersSent;
+    }
+    
+    /**
+     * Gets cases by their current status
+     * @param status The status to filter by
+     * @return List of cases with the specified status
+     */
+    public List<RegulatoryCase> getCasesByStatus(CaseStatus status) {
+        return cases.values().stream()
+                .filter(c -> c.getStatus() == status)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * Gets cases that are approaching statute of limitations
+     * @param warningDays Days before expiration to include in warning list
+     * @return List of cases approaching statute of limitations
+     */
+    public List<RegulatoryCase> getCasesApproachingStatuteOfLimitations(int warningDays) {
+        LocalDate warningDate = LocalDate.now().plusDays(warningDays);
+        
+        return cases.values().stream()
+                .filter(c -> c.getStatus() != CaseStatus.CLOSED)
+                .filter(c -> {
+                    LocalDate expirationDate = c.getOffense().getOffenseDate()
+                            .plusMonths(STATUTE_OF_LIMITATIONS_MONTHS);
+                    return !expirationDate.isAfter(warningDate);
+                })
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * Gets all cases in the system
+     * @return List of all cases
+     */
+    public List<RegulatoryCase> getAllCases() {
+        return new ArrayList<>(cases.values());
+    }
+    
+    /**
+     * Gets cases for a specific offender
+     * @param offenderId The offender ID
+     * @return List of cases for the offender
+     */
+    public List<RegulatoryCase> getCasesByOffender(String offenderId) {
+        return cases.values().stream()
+                .filter(c -> c.getOffense().getOffender().getId().equals(offenderId))
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * Gets offender by ID
+     * @param offenderId The offender ID
+     * @return The offender or null if not found
+     */
+    public Offender getOffenderById(String offenderId) {
+        return offenders.get(offenderId);
+    }
+}
+
+
+package com.regulatory.management;
+
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.format.TextStyle;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import lombok.RequiredArgsConstructor;
+
+/**
+ * Generates various reports based on regulatory cases
+ */
+@RequiredArgsConstructor
+public class ReportGenerator {
+    private final CaseManager caseManager;
+    
+    /**
+     * Generates a report on monthly fine statistics
+     * @return The report as a formatted string
+     */
+    public String generateMonthlyFineStatistics() {
+        List<RegulatoryCase> allCases = caseManager.getAllCases();
+        
+        // Group by month
+        Map<Month, Double> monthlyFines = new HashMap<>();
+        Map<Month, Integer> monthlyCounts = new HashMap<>();
+        
+        for (RegulatoryCase regulatoryCase : allCases) {
+            Month month = regulatoryCase.getCreationDate().getMonth();
+            double fineAmount = regulatoryCase.getFine().getAmount();
+            
+            monthlyFines.put(month, monthlyFines.getOrDefault(month, 0.0) + fineAmount);
+            monthlyCounts.put(month, monthlyCounts.getOrDefault(month, 0) + 1);
+        }
+        
+        // Build report
+        StringBuilder report = new StringBuilder();
+        report.append("========================\n");
+        report.append("Monthly Fine Statistics\n");
+        report.append("========================\n");
+        report.append(String.format("%-10s %-15s %-15s %-15s\n", 
+                      "Month", "Case Count", "Total Fines", "Average Fine"));
+        report.append("--------------------------------------------------------\n");
+        
+        double totalFines = 0.0;
+        int totalCases = 0;
+        
+        for (Month month : Month.values()) {
+            if (monthlyFines.containsKey(month)) {
+                double totalMonthlyFines = monthlyFines.get(month);
+                int caseCount = monthlyCounts.get(month);
+                double averageFine = totalMonthlyFines / caseCount;
+                
+                report.append(String.format("%-10s %-15d $%-14.2f $%-14.2f\n",
+                              month.getDisplayName(TextStyle.FULL, Locale.ENGLISH),
+                              caseCount, totalMonthlyFines, averageFine));
+                
+                totalFines += totalMonthlyFines;
+                totalCases += caseCount;
+            }
+        }
+        
+        report.append("--------------------------------------------------------\n");
+        report.append(String.format("%-10s %-15d $%-14.2f $%-14.2f\n",
+                     "TOTAL", totalCases, totalFines, 
+                     totalCases > 0 ? totalFines / totalCases : 0.0));
+        
+        return report.toString();
+    }
+    
+    /**
+     * Generates a report on payment status
+     * @return The report as a formatted string
+     */
+    public String generatePaymentStatusReport() {
+        List<RegulatoryCase> allCases = caseManager.getAllCases();
+        
+        // Count cases by payment status
+        Map<PaymentStatus, Integer> statusCounts = new HashMap<>();
+        Map<PaymentStatus, Double> statusAmounts = new HashMap<>();
+        
+        for (RegulatoryCase regulatoryCase : allCases) {
+            PaymentStatus status = regulatoryCase.getFine().getPaymentStatus();
+            double amount = regulatoryCase.getFine().getAmount();
+            
+            statusCounts.put(status, statusCounts.getOrDefault(status, 0) + 1);
+            statusAmounts.put(status, statusAmounts.getOrDefault(status, 0.0) + amount);
+        }
+        
+        // Build report
+        StringBuilder report = new StringBuilder();
+        report.append("========================\n");
+        report.append("Payment Status Report\n");
+        report.append("========================\n");
+        report.append(String.format("%-15s %-15s %-15s\n", 
+                      "Status", "Case Count", "Total Amount"));
+        report.append("-------------------------------------------\n");
+        
+        int totalCases = 0;
+        double totalAmount = 0.0;
+        
+        for (PaymentStatus status : PaymentStatus.values()) {
+            int count = statusCounts.getOrDefault(status, 0);
+            double amount = statusAmounts.getOrDefault(status, 0.0);
+            
+            report.append(String.format("%-15s %-15d $%-14.2f\n",
+                         status, count, amount));
+            
+            totalCases += count;
+            totalAmount += amount;
+        }
+        
+        report.append("-------------------------------------------\n");
+        report.append(String.format("%-15s %-15d $%-14.2f\n",
+                     "TOTAL", totalCases, totalAmount));
+        
+        // Calculate overdue percentage
+        int overdueCases = statusCounts.getOrDefault(PaymentStatus.OVERDUE, 0);
+        double overduePercentage = totalCases > 0 ? (overdueCases * 100.0 / totalCases) : 0.0;
+        
+        report.append("\nPercentage of overdue cases: ").append(String.format("%.2f%%", overduePercentage));
+        
+        return report.toString();
+    }
+    
+    /**
+     * Generates a report on offense type distribution
+     * @return The report as a formatted string
+     */
+    public String generateOffenseTypeDistribution() {
+        List<RegulatoryCase> allCases = caseManager.getAllCases();
+        
+        // Count cases by offense type
+        Map<OffenseType, Integer> typeCounts = new HashMap<>();
+        Map<OffenseType, Double> typeAmounts = new HashMap<>();
+        
+        for (RegulatoryCase regulatoryCase : allCases) {
+            OffenseType type = regulatoryCase.getOffense().getOffenseType();
+            double amount = regulatoryCase.getFine().getAmount();
+            
+            typeCounts.put(type, typeCounts.getOrDefault(type, 0) + 1);
+            typeAmounts.put(type, typeAmounts.getOrDefault(type, 0.0) + amount);
+        }
+        
+        // Build report
+        StringBuilder report = new StringBuilder();
+        report.append("========================\n");
+        report.append("Offense Type Distribution\n");
+        report.append("========================\n");
+        report.append(String.format("%-25s %-15s %-15s %-15s\n", 
+                      "Offense Type", "Case Count", "Total Fines", "Average Fine"));
+        report.append("-------------------------------------------------------------------------\n");
+        
+        int totalCases = 0;
+        double totalAmount = 0.0;
+        
+        for (OffenseType type : OffenseType.values()) {
+            int count = typeCounts.getOrDefault(type, 0);
+            double amount = typeAmounts.getOrDefault(type, 0.0);
+            double average = count > 0 ? amount / count : 0.0;
+            
+            report.append(String.format("%-25s %-15d $%-14.2f $%-14.2f\n",
+                         type.name(), count, amount, average));
+            
+            totalCases += count;
+            totalAmount += amount;
+        }
+        
+        report.append("-------------------------------------------------------------------------\n");
+        report.append(String.format("%-25s %-15d $%-14.2f $%-14.2f\n",
+                     "TOTAL", totalCases, totalAmount, 
+                     totalCases > 0 ? totalAmount / totalCases : 0.0));
+        
+        return report.toString();
+    }
+    
+    /**
+     * Generates a report on cases approaching statute of limitations
+     * @param warningDays Days before expiration to include in warning list
+     * @return The report as a formatted string
+     */
+    public String generateStatuteOfLimitationsReport(int warningDays) {
+        List<RegulatoryCase> approachingCases = 
+            caseManager.getCasesApproachingStatuteOfLimitations(warningDays);
+        
+        // Build report
+        StringBuilder report = new StringBuilder();
+        report.append("=======================================\n");
+        report.append("Cases Approaching Statute of Limitations\n");
+        report.append("=======================================\n");
+        
+        if (approachingCases.isEmpty()) {
+            report.append("No cases approaching statute of limitations within " + warningDays + " days.");
+            return report.toString();
+        }
+        
+        report.append(String.format("%-10s %-20s %-15s %-20s\n", 
+                     "Case ID", "Offense Type", "Offense Date", "Offender Name"));
+        report.append("-----------------------------------------------------------------------\n");
+        
+        for (RegulatoryCase regulatoryCase : approachingCases) {
+            String caseId = regulatoryCase.getCaseId().substring(0, 8) + "...";
+            String offenderName = regulatoryCase.getOffense().getOffender().getFullName();
+            
+            report.append(String.format("%-10s %-20s %-15s %-20s\n",
+                         caseId,
+                         regulatoryCase.getOffense().getOffenseType(),
+                         regulatoryCase.getOffense().getOffenseDate(),
+                         offenderName));
+        }
+        
+        return report.toString();
+    }
+}
+
+
+I'll continue with the remaining implementation files for the Regulatory Offense Management System.
+
+I've created a comprehensive Java console application for a Regulatory Offense Management System based on the business logic description provided. The system allows for recording and managing regulatory offenses, calculating fines, handling payments, processing appeals, and generating reports.
+
+Here's an overview of the implemented components:
+
+1. **Core Entities**:
+   - `Offender`: Stores information about individuals who commit regulatory offenses
+   - `Offense`: Represents specific regulatory violations with details like location and date
+   - `OffenseType`: Enum defining different types of offenses with base fine amounts
+   - `Fine`: Manages the monetary penalty, payment status, and deadlines
+   - `Payment`: Records individual payments made toward fines
+   - `Appeal`: Handles appeals against fines including decisions and supporting documents
+   - `RegulatoryCase`: The central entity that ties everything together
+
+2. **Supporting Classes**:
+   - `CaseAction`: Records all actions taken on a case for audit trail purposes
+   - Various enums (`PaymentMethod`, `PaymentStatus`, `CaseStatus`, `ActionType`)
+   - `CaseManager`: Handles the business logic for creating and managing cases
+   - `ReportGenerator`: Creates various statistical and analytical reports
+
+3. **Business Logic Implementation**:
+   - Record Regulatory Offense: Creates new cases with validated information
+   - Calculate Fine: Determines appropriate fine amounts with adjustments for repeat offenders
+   - Payment Request Process: Tracks payments and overdue fines
+   - Appeal Process: Allows for filing and resolving appeals
+   - Case Monitoring: Tracks status changes throughout the case lifecycle
+   - Statute of Limitations: Monitors time-sensitive cases
+
+4. **Console Interface**:
+   - Menu-driven interface for user interaction
+   - Options to record offenses, view cases, process payments, handle appeals, and generate reports
+
+The implemented system follows Java naming conventions and uses Lombok to reduce boilerplate code. Each class is designed to be in its own file following object-oriented principles with proper encapsulation and separation of concerns.
+
+Would you like me to explain any particular aspect of the implementation in more detail?
